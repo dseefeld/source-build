@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" InitialTargets="SetNuGetPackagesEnvironment" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Condition="'$(OfflineBuild)' == 'true'">
+  <ItemGroup Condition="'$(BuildOffline)' == 'true'">
     <EnvironmentVariables Include="LatestCommit=$(LatestCommit)" />
     <EnvironmentVariables Include="OfficialBuildId=$(OfficialBuildId)" />
     <EnvironmentVariables Include="VersionSeedDate=$(OfficialBuildId)" />
@@ -43,7 +43,7 @@
   <!-- Source override arguments -->
   <PropertyGroup Condition="'$(SourceOverrideRepoApiImplemented)' == 'true'">
     <RepoApiArgs>$(RepoApiArgs) /p:DotNetRestoreSourcePropsPath=$(RestoreSourcePropsPath)</RepoApiArgs>
-    <RepoApiArgs Condition="'$(OfflineBuild)' == 'true'">$(RepoApiArgs) /p:DotNetBuildOffline=true</RepoApiArgs>
+    <RepoApiArgs Condition="'$(BuildOffline)' == 'true'">$(RepoApiArgs) /p:DotNetBuildOffline=true</RepoApiArgs>
   </PropertyGroup>
   <!-- Output placement arguments -->
   <PropertyGroup Condition="'$(OutputPlacementRepoApiImplemented)' == 'true'">
@@ -80,12 +80,12 @@
           BeforeTargets="Build"
           Condition="'$(NuGetConfigFile)' != ''">
     <RemoveInternetSourcesFromNuGetConfig NuGetConfigFile="$(NuGetConfigFile)"
-                                          Condition="'$(OfflineBuild)' != ''" />
+                                          Condition="'$(BuildOffline)' != ''" />
 
     <AddSourceToNuGetConfig NuGetConfigFile="$(NuGetConfigFile)"
                             SourceName="prebuilt"
                             SourcePath="$(PrebuiltPackagesPath)"
-                            Condition="'$(OfflineBuild)' == 'true'" />
+                            Condition="'$(BuildOffline)' == 'true'" />
 
     <AddSourceToNuGetConfig NuGetConfigFile="$(NuGetConfigFile)"
                             SourceName="source-built"
@@ -105,7 +105,7 @@
           BeforeTargets="Build">
     <ItemGroup>
       <_DotNetRestoreSources Include="$(SourceBuiltPackagesPath)" />
-      <_DotNetRestoreSources Include="$(PrebuiltPackagesPath)" Condition="'$(OfflineBuild)' == 'true'"/>
+      <_DotNetRestoreSources Include="$(PrebuiltPackagesPath)" Condition="'$(BuildOffline)' == 'true'"/>
     </ItemGroup>
     <WriteRestoreSourceProps RestoreSources="@(_DotNetRestoreSources)"
                              OutputPath="$(RestoreSourcePropsPath)" />

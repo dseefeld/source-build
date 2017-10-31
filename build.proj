@@ -22,7 +22,12 @@
     <MSBuild Projects="tools-local/init-build.proj" />
   </Target>
 
+  <Target Name="WriteDynamicPropsToStaticPropsFiles">
+    <MSBuild Projects="tools-local/init-build.proj" Targets="WriteDynamicPropsToStaticPropsFiles" />
+  </Target>
+
   <Target Name="Clean">
+    <MSBuild Projects="tools-local/init-build.proj" Targets="Clean"/>
     <RemoveDir Directories="$(BaseOutputPath)" />
   </Target>
 
