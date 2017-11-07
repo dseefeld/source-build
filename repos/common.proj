@@ -7,7 +7,7 @@
     <RepositoryBranch>servicing/1.0.x</RepositoryBranch>
     <PackagesOutput>$(ProjectDirectory)artifacts/build/</PackagesOutput>
     <BuildArguments>/p:Configuration=$(Configuration)</BuildArguments>
-    <BuildCommand>$(ProjectDirectory)/build$(ShellExtension) -NoTest $(BuildArguments)</BuildCommand>
+    <BuildCommand>$(ProjectDirectory)/build$(ShellExtension) -NoTest $(ProjectDirectory)/src/Microsoft.Extensions.CommandLineUtils/Microsoft.Extensions.CommandLineUtils.csproj $(BuildArguments)</BuildCommand>
     <CleanCommand>$(ProjectDirectory)/clean$(ShellExtension) $(BuildArguments)</CleanCommand>
   </PropertyGroup>
 
