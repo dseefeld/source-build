@@ -7,7 +7,7 @@
 	url = https://github.com/dotnet/roslyn
 [submodule "src/core-setup"]
 	path = src/core-setup
-	url = https://github.com/dotnet/core-setup
+	url = https://github.com/dseefeld/core-setup
 	branch = release/2.0.0
 [submodule "src/standard"]
 	path = src/standard
@@ -45,7 +45,7 @@
 	url = https://github.com/dotnet/cli-migrate
 [submodule "src/corefx"]
 	path = src/corefx
-	url = https://github.com/dotnet/corefx
+	url = https://github.com/dseefeld/corefx
 	branch = release/2.0.0
 [submodule "src/fsharp"]
 	path = src/fsharp
