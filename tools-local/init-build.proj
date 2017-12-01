@@ -10,19 +10,19 @@
   <UsingTask AssemblyFile="$(TasksBinDir)Microsoft.DotNet.SourceBuild.Tasks.dll" TaskName="BuildDummyPackages" />
 
   <PropertyGroup>
-    <BuildCompetedSuccessSemaphore>$(BaseIntermediatePath)/init-build-proj.complete</BuildCompetedSuccessSemaphore>
+    <BuildCompletedSuccessSemaphore>$(BaseIntermediatePath)/init-build-proj.complete</BuildCompletedSuccessSemaphore>
   </PropertyGroup>
 
   <Target Name="Build"
     Inputs="$(TargetInfoProps)"
-    Outputs="$(BuildCompetedSuccessSemaphore)"
+    Outputs="$(BuildCompletedSuccessSemaphore)"
     >
     <CallTarget Targets="BuildTasks;WriteDynamicPropsToStaticPropsFiles;GenerateRootFs;ApplyPatches;BuildDummyPackages;BuildReferenceAssemblies" />
-    <Touch Files="$(BuildCompetedSuccessSemaphore)" AlwaysCreate="true" />
+    <Touch Files="$(BuildCompletedSuccessSemaphore)" AlwaysCreate="true" />
   </Target>
 
   <Target Name="Clean">
-    <Delete Files="$(BuildCompetedSuccessSemaphore)" />
+    <Delete Files="$(BuildCompletedSuccessSemaphore)" />
   </Target>
 
   <Target Name="BuildTasks">
@@ -46,6 +46,8 @@
 
   <Target Name="BuildDummyPackages" Condition="'$(OfflineBuild)' == 'true'">
     <ItemGroup>
+      <DummyPackage Include="Microsoft.NETCore.Runtime.CoreCLR" Version="1.1.1" />
+<!--
       <DummyPackage Include="Castle.Core" Version="3.3.3" />
       <DummyPackage Include="Castle.Core" Version="4.0.0-beta001" />
       <DummyPackage Include="Chutzpah" Version="4.2.4" />
@@ -279,6 +281,7 @@
       <DummyPackage Include="xunit.extensibility.core" Version="2.2.0" />
       <DummyPackage Include="xunit.extensibility.execution" Version="2.2.0" />
       <DummyPackage Include="xunit.runner.visualstudio" Version="2.2.0" />
+-->
     </ItemGroup>
 
     <BuildDummyPackages Packages="@(DummyPackage)"
@@ -291,7 +294,7 @@
     <Exec Command="$(DotNetCliToolDir)/dotnet pack $(SubmoduleDirectory)/reference-assemblies/nuspecs/PackAll.proj" />
   </Target>
 
-  <Target Name="WriteDynamicPropsToStaticPropsFiles">
+  <Target Name="WriteDynamicPropsToStaticPropsFiles" Condition="!Exists($(TargetInfoProps))">
     <GetHostInformation Condition="'$(TargetRid)' == ''">
       <Output PropertyName="TargetRid" TaskParameter="Rid" />
     </GetHostInformation>
