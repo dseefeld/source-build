@@ -11,6 +11,7 @@
   <UsingTask AssemblyFile="$(TasksBinDir)Microsoft.DotNet.SourceBuild.Tasks.dll" TaskName="WriteBuildOutputProps" />
   <UsingTask AssemblyFile="$(TasksBinDir)Microsoft.DotNet.SourceBuild.Tasks.dll" TaskName="WriteRestoreSourceProps" />
   <UsingTask AssemblyFile="$(TasksBinDir)Microsoft.DotNet.SourceBuild.Tasks.dll" TaskName="WriteVersionsFile" />
+  <UsingTask AssemblyFile="$(TasksBinDir)Microsoft.DotNet.SourceBuild.Tasks.dll" TaskName="WriteFileInventory" />
 
   <!--
     Central property to define that a repo doesn't implement any of the Repo API. If a repo adds an
@@ -50,6 +51,11 @@
     <RepoApiArgs>$(RepoApiArgs) /p:DotNetOutputBlobFeedDir=$(SourceBuiltBlobFeedDir)</RepoApiArgs>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(FileInventoryPath)'!=''" >
+    <FileInventoryBeforePath>$(FileInventoryPath)$(RepositoryName)/before/</FileInventoryBeforePath>
+    <FileInventoryAfterPath>$(FileInventoryPath)$(RepositoryName)/after/</FileInventoryAfterPath>
+  </PropertyGroup>
+
   <Import Project="$(ProjectDirectory)dependencies.props"
           Condition="'$(DependencyVersionInputRepoApiImplemented)' != 'true' AND
                      Exists('$(ProjectDirectory)dependencies.props')" />
@@ -74,6 +80,30 @@
 
     <Exec Command="$(PatchCommand) %(PatchesToApply.Identity)"
           WorkingDirectory="$(ProjectDirectory)" />
+  </Target>
+
+  <Target Name="InventoryFilesBeforeBuild"
+          BeforeTargets="Build">
+
+    <WriteFileInventory SourcePath="$(BaseOutputPath)"
+                        OutputPath="$(FileInventoryBeforePath)binInventory.txt"
+                        Condition="'$(FileInventoryBeforePath)'!=''" />
+
+    <WriteFileInventory SourcePath="$(NUGET_PACKAGES)"
+                        OutputPath="$(FileInventoryBeforePath)packageInventory.txt"
+                        Condition="'$(FileInventoryBeforePath)'!=''" />
+
+    <WriteFileInventory SourcePath="$(ProjectDirectory)"
+                        OutputPath="$(FileInventoryBeforePath)repoSourceInventory.txt"
+                        Condition="'$(FileInventoryBeforePath)'!=''" />
+
+    <Copy SourceFiles="$(VersionFileLocation)"
+          DestinationFolder="$(FileInventoryBeforePath)"
+          Condition="Exists('$(VersionFileLocation)')" />
+
+    <Copy SourceFiles="$(PackageVersionPropsPath)"
+          DestinationFolder="$(FileInventoryBeforePath)"
+          Condition="Exists('$(PackageVersionPropsPath)')" />
   </Target>
 
   <Target Name="UpdateNuGetConfig"
@@ -171,6 +201,30 @@
     <WriteVersionsFile NugetPackages="@(_BuiltPackages)"
                        OutputPath="$(VersionFileLocation)"
                        Condition="'@(_BuiltPackages)'!=''" />
+  </Target>
+
+  <Target Name="InventoryFilesAfterBuild"
+          AfterTargets="WriteVersions">
+
+    <WriteFileInventory SourcePath="$(BaseOutputPath)"
+                        OutputPath="$(FileInventoryAfterPath)binInventory.txt"
+                        Condition="'$(FileInventoryAfterPath)'!=''" />
+
+    <WriteFileInventory SourcePath="$(NUGET_PACKAGES)"
+                        OutputPath="$(FileInventoryAfterPath)packageInventory.txt"
+                        Condition="'$(FileInventoryAfterPath)'!=''" />
+
+    <WriteFileInventory SourcePath="$(ProjectDirectory)"
+                        OutputPath="$(FileInventoryAfterPath)repoSourceInventory.txt"
+                        Condition="'$(FileInventoryAfterPath)'!=''" />
+
+    <Copy SourceFiles="$(VersionFileLocation)"
+          DestinationFolder="$(FileInventoryAfterPath)"
+          Condition="Exists('$(VersionFileLocation)')" />
+
+    <Copy SourceFiles="$(PackageVersionPropsPath)"
+          DestinationFolder="$(FileInventoryAfterPath)"
+          Condition="Exists('$(PackageVersionPropsPath)')" />
   </Target>
 
   <Target Name="Clean" Condition="'$(CleanCommand)' != ''" >
