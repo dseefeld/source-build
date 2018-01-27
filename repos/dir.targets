@@ -99,11 +99,11 @@
 
     <Copy SourceFiles="$(VersionFileLocation)"
           DestinationFolder="$(FileInventoryBeforePath)"
-          Condition="Exists('$(VersionFileLocation)')" />
+          Condition="Exists('$(VersionFileLocation)') AND '$(FileInventoryBeforePath)'!=''" />
 
     <Copy SourceFiles="$(PackageVersionPropsPath)"
           DestinationFolder="$(FileInventoryBeforePath)"
-          Condition="Exists('$(PackageVersionPropsPath)')" />
+          Condition="Exists('$(PackageVersionPropsPath)') AND '$(FileInventoryBeforePath)'!=''" />
   </Target>
 
   <Target Name="UpdateNuGetConfig"
@@ -220,11 +220,11 @@
 
     <Copy SourceFiles="$(VersionFileLocation)"
           DestinationFolder="$(FileInventoryAfterPath)"
-          Condition="Exists('$(VersionFileLocation)')" />
+          Condition="Exists('$(VersionFileLocation)') AND '$(FileInventoryAfterPath)'!=''" />
 
     <Copy SourceFiles="$(PackageVersionPropsPath)"
           DestinationFolder="$(FileInventoryAfterPath)"
-          Condition="Exists('$(PackageVersionPropsPath)')" />
+          Condition="Exists('$(PackageVersionPropsPath)') AND '$(FileInventoryAfterPath)'!=''" />
   </Target>
 
   <Target Name="Clean" Condition="'$(CleanCommand)' != ''" >
