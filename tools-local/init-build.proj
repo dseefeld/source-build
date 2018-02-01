@@ -329,6 +329,6 @@
     </ItemGroup>
 
     <Move SourceFiles="@(_AllRootPackages)"
-          DestinationFolder="$(ProjectDir)/packages-save/" />
+          DestinationFiles="@(_AllRootPackages->'$(ProjectDir)/packages-save/%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 </Project>

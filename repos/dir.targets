@@ -95,6 +95,9 @@
     <WriteFileInventory SourcePath="$(ProjectDirectory)"
                         OutputPath="$(FileInventoryBeforePath)repoSourceInventory.txt" />
 
+    <WriteFileInventory SourcePath="$(ProjectDir)Tools"
+                        OutputPath="$(FileInventoryBeforePath)toolsInventory.txt" />
+
     <Copy SourceFiles="$(VersionFileLocation)"
           DestinationFolder="$(FileInventoryBeforePath)"
           Condition="Exists('$(VersionFileLocation)')" />
@@ -214,6 +217,9 @@
     <WriteFileInventory SourcePath="$(ProjectDirectory)"
                         OutputPath="$(FileInventoryAfterPath)repoSourceInventory.txt" />
 
+    <WriteFileInventory SourcePath="$(ProjectDir)Tools"
+                        OutputPath="$(FileInventoryAfterPath)toolsInventory.txt" />
+
     <Copy SourceFiles="$(VersionFileLocation)"
           DestinationFolder="$(FileInventoryAfterPath)"
           Condition="Exists('$(VersionFileLocation)')" />
@@ -227,7 +233,7 @@
     </ItemGroup>
     
     <Move SourceFiles="@(_AllRootPackages)"
-          DestinationFolder="$(ProjectDir)/packages-save/" />
+          DestinationFiles="@(_AllRootPackages->'$(ProjectDir)/packages-save/%(RecursiveDir)%(Filename)%(Extension)')" />      
   </Target>
 
   <Target Name="Clean" Condition="'$(CleanCommand)' != ''" >
