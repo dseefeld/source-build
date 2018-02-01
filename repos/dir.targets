@@ -83,27 +83,25 @@
   </Target>
 
   <Target Name="InventoryFilesBeforeBuild"
-          BeforeTargets="Build">
+          BeforeTargets="Build"
+          Condition="'$(FileInventoryBeforePath)'!=''" >
 
     <WriteFileInventory SourcePath="$(BaseOutputPath)"
-                        OutputPath="$(FileInventoryBeforePath)binInventory.txt"
-                        Condition="'$(FileInventoryBeforePath)'!=''" />
+                        OutputPath="$(FileInventoryBeforePath)binInventory.txt" />
 
-    <WriteFileInventory SourcePath="$(NUGET_PACKAGES)"
-                        OutputPath="$(FileInventoryBeforePath)packageInventory.txt"
-                        Condition="'$(FileInventoryBeforePath)'!=''" />
+    <WriteFileInventory SourcePath="$(PackagesDir)"
+                        OutputPath="$(FileInventoryBeforePath)packageInventory.txt" />
 
     <WriteFileInventory SourcePath="$(ProjectDirectory)"
-                        OutputPath="$(FileInventoryBeforePath)repoSourceInventory.txt"
-                        Condition="'$(FileInventoryBeforePath)'!=''" />
+                        OutputPath="$(FileInventoryBeforePath)repoSourceInventory.txt" />
 
     <Copy SourceFiles="$(VersionFileLocation)"
           DestinationFolder="$(FileInventoryBeforePath)"
-          Condition="Exists('$(VersionFileLocation)') AND '$(FileInventoryBeforePath)'!=''" />
+          Condition="Exists('$(VersionFileLocation)')" />
 
     <Copy SourceFiles="$(PackageVersionPropsPath)"
           DestinationFolder="$(FileInventoryBeforePath)"
-          Condition="Exists('$(PackageVersionPropsPath)') AND '$(FileInventoryBeforePath)'!=''" />
+          Condition="Exists('$(PackageVersionPropsPath)')" />
   </Target>
 
   <Target Name="UpdateNuGetConfig"
@@ -204,27 +202,32 @@
   </Target>
 
   <Target Name="InventoryFilesAfterBuild"
-          AfterTargets="WriteVersions">
+          AfterTargets="WriteVersions"
+          Condition="'$(FileInventoryAfterPath)'!=''" >
 
     <WriteFileInventory SourcePath="$(BaseOutputPath)"
-                        OutputPath="$(FileInventoryAfterPath)binInventory.txt"
-                        Condition="'$(FileInventoryAfterPath)'!=''" />
+                        OutputPath="$(FileInventoryAfterPath)binInventory.txt" />
 
-    <WriteFileInventory SourcePath="$(NUGET_PACKAGES)"
-                        OutputPath="$(FileInventoryAfterPath)packageInventory.txt"
-                        Condition="'$(FileInventoryAfterPath)'!=''" />
+    <WriteFileInventory SourcePath="$(PackagesDir)"
+                        OutputPath="$(FileInventoryAfterPath)packageInventory.txt" />
 
     <WriteFileInventory SourcePath="$(ProjectDirectory)"
-                        OutputPath="$(FileInventoryAfterPath)repoSourceInventory.txt"
-                        Condition="'$(FileInventoryAfterPath)'!=''" />
+                        OutputPath="$(FileInventoryAfterPath)repoSourceInventory.txt" />
 
     <Copy SourceFiles="$(VersionFileLocation)"
           DestinationFolder="$(FileInventoryAfterPath)"
-          Condition="Exists('$(VersionFileLocation)') AND '$(FileInventoryAfterPath)'!=''" />
+          Condition="Exists('$(VersionFileLocation)')" />
 
     <Copy SourceFiles="$(PackageVersionPropsPath)"
           DestinationFolder="$(FileInventoryAfterPath)"
-          Condition="Exists('$(PackageVersionPropsPath)') AND '$(FileInventoryAfterPath)'!=''" />
+          Condition="Exists('$(PackageVersionPropsPath)')" />
+
+    <ItemGroup>
+        <_AllRootPackages Include="$(PackagesDir)/**/*" />
+    </ItemGroup>
+    
+    <Move SourceFiles="@(_AllRootPackages)"
+          DestinationFolder="$(ProjectDir)/packages-save/" />
   </Target>
 
   <Target Name="Clean" Condition="'$(CleanCommand)' != ''" >

@@ -8,9 +8,14 @@
 
   <UsingTask AssemblyFile="$(TasksBinDir)Microsoft.DotNet.SourceBuild.Tasks.dll" TaskName="GetHostInformation" />
   <UsingTask AssemblyFile="$(TasksBinDir)Microsoft.DotNet.SourceBuild.Tasks.dll" TaskName="BuildDummyPackages" />
+  <UsingTask AssemblyFile="$(TasksBinDir)Microsoft.DotNet.SourceBuild.Tasks.dll" TaskName="WriteFileInventory" />
 
   <PropertyGroup>
     <BuildCompetedSuccessSemaphore>$(BaseIntermediatePath)/init-build-proj.complete</BuildCompetedSuccessSemaphore>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FileInventoryPath)'!=''" >
+    <FileInventoryAfterPath>$(FileInventoryPath)init-build/after/</FileInventoryAfterPath>
   </PropertyGroup>
 
   <Target Name="Build"
@@ -312,4 +317,18 @@
     <WriteLinesToFile File="$(TargetInfoProps)" Lines="$(TargetInfoPropsContent)" Overwrite="True" />
   </Target>
 
+  <Target Name="InventoryFilesAfterBuild"
+    AfterTargets="Build"
+    Condition="'$(FileInventoryAfterPath)'!=''" >
+
+    <WriteFileInventory SourcePath="$(PackagesDir)"
+                        OutputPath="$(FileInventoryAfterPath)packageInventory.txt" />
+
+    <ItemGroup>
+        <_AllRootPackages Include="$(PackagesDir)/**/*" />
+    </ItemGroup>
+
+    <Move SourceFiles="@(_AllRootPackages)"
+          DestinationFolder="$(ProjectDir)/packages-save/" />
+  </Target>
 </Project>
