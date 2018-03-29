@@ -1,0 +1,38 @@
+From 95ef84b25d21bca046156a7616ea147324d91af8 Mon Sep 17 00:00:00 2001
+From: dseefeld <dseefeld@microsoft.com>
+Date: Thu, 29 Mar 2018 19:35:29 +0000
+Subject: [PATCH] Use DotNetCoreSdkDir for CLI if available
+
+---
+ build/build.sh | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/build/build.sh b/build/build.sh
+index ef7e685..a093579 100755
+--- a/build/build.sh
++++ b/build/build.sh
+@@ -117,6 +117,21 @@ function InstallDotNetCli {
+   DotNetCliVersion="$( GetVersionsPropsVersion DotNetCliVersion )"
+   DotNetInstallVerbosity=""
+ 
++  if [ "$DotNetCoreSdkDir" != "" ]
++  then
++      DotNetRoot=$DotNetCoreSdkDir  
++    
++      # Put the stage 0 on the path
++      export PATH="$DotNetRoot:$PATH"
++
++      # Disable first run since we want to control all package sources
++      export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
++
++      # Don't resolve runtime, shared framework, or SDK from other locations
++      export DOTNET_MULTILEVEL_LOOKUP=0
++      return
++  fi
++
+   if $dogfood
+   then
+     export SDK_REPO_ROOT="$RepoRoot"
+-- 
+1.8.3.1
+
