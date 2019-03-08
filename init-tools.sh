@@ -5,11 +5,27 @@ __init_tools_log="$__scriptpath/init-tools.log"
 __PACKAGES_DIR="$__scriptpath/packages"
 __TOOLRUNTIME_DIR="$__scriptpath/Tools"
 __DOTNET_PATH="$__TOOLRUNTIME_DIR/dotnetcli"
+__BOOTSTRAP_TOOLS_PATH="$__scriptpath/BootstrapTools"
+
+if [ -e "$__BOOTSTRAP_TOOLS_PATH" ]; then
+    echo "Bootstrap tools directory found..."
+
+    if (ls "$__BOOTSTRAP_TOOLS_PATH/Microsoft.DotNet.BuildTools."*.nupkg > /dev/null 2>&1); then
+        __BUILDTOOLS_SOURCE="$__BOOTSTRAP_TOOLS_PATH;https://dotnet.myget.org/F/dotnet-buildtools/api/v3/index.json"
+        __BUILD_TOOLS_PACKAGE_VERSION=$(ls BootstrapTools/Microsoft.DotNet.BuildTools.*.nupkg | awk -F. '{printf "%s.%s.%s\n", $4, $5, $6}')
+        echo "Found BuildTools version=$__BUILD_TOOLS_PACKAGE_VERSION"
+    fi
+    if (ls "$__BOOTSTRAP_TOOLS_PATH/"*.tar.gz > /dev/null 2>&1); then
+        DotNetBootstrapCliTarPath=$(ls $__BOOTSTRAP_TOOLS_PATH/*.tar.gz)
+        echo "Found Cli tar file =  $DotNetBootstrapCliTarPath"
+    fi
+fi
+
 __DOTNET_CMD="$__DOTNET_PATH/dotnet"
 if [ -z "${__BUILDTOOLS_SOURCE:-}" ]; then __BUILDTOOLS_SOURCE=https://dotnet.myget.org/F/dotnet-buildtools/api/v3/index.json; fi
 export __BUILDTOOLS_USE_CSPROJ=true
-__BUILD_TOOLS_PACKAGE_VERSION=$(cat "$__scriptpath/BuildToolsVersion.txt" | sed 's/\r$//') # remove CR if mounted repo on Windows drive
-__DOTNET_TOOLS_VERSION=$(cat "$__scriptpath/DotnetCLIVersion.txt" | sed 's/\r$//') # remove CR if mounted repo on Windows drive
+if [ -z "${__BUILD_TOOLS_PACKAGE_VERSION:-}" ]; then __BUILD_TOOLS_PACKAGE_VERSION=$(cat "$__scriptpath/BuildToolsVersion.txt" | sed 's/\r$//'); fi # remove CR if mounted repo on Windows drive
+if [ -z "${__DOTNET_TOOLS_VERSION:-}" ]; then __DOTNET_TOOLS_VERSION=$(cat "$__scriptpath/DotnetCLIVersion.txt" | sed 's/\r$//'); fi # remove CR if mounted repo on Windows drive
 __ILASM_VERSION=$(cat "$__scriptpath/tools-local/ILAsmVersion.txt" | sed 's/\r$//') # remove CR if mounted repo on Windows drive
 __BUILD_TOOLS_PATH="$__PACKAGES_DIR/microsoft.dotnet.buildtools/$__BUILD_TOOLS_PACKAGE_VERSION/lib"
 __INIT_TOOLS_RESTORE_PROJECT="$__scriptpath/init-tools.msbuild"
@@ -162,10 +178,10 @@ echo "Using RID $__ILASM_RID for BuildTools native tools"
 export ILASMCOMPILER_VERSION=$__ILASM_VERSION
 export NATIVE_TOOLS_RID=$__ILASM_RID
 
-if [ -n "${DotNetBootstrapCliTarPath-}" ]; then
+#if [ -n "${DotNetBootstrapCliTarPath-}" ]; then
     # Assume ilasm is not in nuget yet when bootstrapping...
-    unset ILASMCOMPILER_VERSION
-fi
+    # unset ILASMCOMPILER_VERSION
+#fi
 
 echo "Initializing BuildTools..."
 echo "Running: $__BUILD_TOOLS_PATH/init-tools.sh $__scriptpath $__DOTNET_CMD $__TOOLRUNTIME_DIR $__PACKAGES_DIR" >> "$__init_tools_log"

@@ -3,7 +3,6 @@ set -euo pipefail
 IFS=$'\n\t'
 
 SCRIPT_ROOT="$(cd -P "$( dirname "$0" )" && pwd)"
-export SDK_VERSION=$(cat $SCRIPT_ROOT/DotnetCLIVersion.txt)
 
 if [ -z "${HOME:-}" ]; then
     export HOME="$SCRIPT_ROOT/.home"
@@ -22,9 +21,9 @@ export NUGET_PACKAGES="$SCRIPT_ROOT/packages/"
 source "$SCRIPT_ROOT/init-tools.sh"
 
 CLIPATH="$SCRIPT_ROOT/Tools/dotnetcli"
+export SDK_VERSION=$($CLIPATH/dotnet --version)
 SDKPATH="$CLIPATH/sdk/$SDK_VERSION"
 
 set -x
 
 $CLIPATH/dotnet $SDKPATH/MSBuild.dll $SCRIPT_ROOT/build.proj /flp:v=diag /clp:v=m "$@"
-
