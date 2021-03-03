@@ -1,19 +1,19 @@
-From f6bdb6e761e42b418817c2dd849660c1d6964f4a Mon Sep 17 00:00:00 2001
+From b4e8c8fe1614fe14558e709c770341c37f7984fa Mon Sep 17 00:00:00 2001
 From: dseefeld <dseefeld@microsoft.com>
-Date: Wed, 15 Jan 2020 15:14:54 +0000
+Date: Fri, 19 Feb 2021 20:19:09 +0000
 Subject: [PATCH] Add source-build specific build script
 
 ---
- build-source-build.sh | 85 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
- create mode 100755 build-source-build.sh
+ build-source-build.sh | 108 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 108 insertions(+)
+ create mode 100644 build-source-build.sh
 
 diff --git a/build-source-build.sh b/build-source-build.sh
 new file mode 100755
-index 00000000000..25c0c1b0625
+index 00000000000..0e407e469e8
 --- /dev/null
 +++ b/build-source-build.sh
-@@ -0,0 +1,85 @@
+@@ -0,0 +1,108 @@
 +#!/usr/bin/env bash
 +set -euo pipefail
 +
@@ -89,16 +89,39 @@ index 00000000000..25c0c1b0625
 +echo "installerArgs = [$installerArgs]"
 +echo "additionalAgs = [$additionalArgs]"
 +
-+echo "Running command: $scriptroot/build.sh $commonArgs -subset clr.tools+clr.runtime+clr.corelib+clr.nativecorelib+clr.packages $coreclrArgs $additionalArgs"
-+$scriptroot/build.sh $commonArgs -subset clr.tools+clr.runtime+clr.corelib+clr.nativecorelib+clr.packages $coreclrArgs $additionalArgs
-+find $scriptroot/artifacts/ -type f -name Build.binlog -exec rename "Build.binlog" "coreclrBuild.binlog" * {} \;
++# Runs a subset build and interprets exit code.
++# $1: Arbitrary name for the subset. Names the log files.
++# $@: Remaining args are passed along.
++#
++# In Arcade 6, in CI mode, the build will always exit 0. This is intentional: https://github.com/dotnet/arcade/pull/6635
++# To work around this (because we always build in CI mode for consistency), scan logs for the
++# CI-style error reporting line so source-build can return the correct exit code.
++subBuild() {
++  name=$1
++  shift
++
++  mkdir "$scriptroot/artifacts" || :
++  logFile="$scriptroot/artifacts/$name.log"
++
++  # Exit NZEC if build command has NZEC *or* if the log file contains an error log command.
++  (
++    set -x
++    "$scriptroot/build.sh" $commonArgs "$@" $additionalArgs | tee "$logFile"
++  ) && (
++    # Grep exits 0 if there is a match. Negate, so we exit 0 if there is no match.
++    ! grep -F '##vso[task.complete result=Failed' "$logFile"
++  )
++
++  # Copy each subset binlog to its own file, rather than overwriting.
++  find $scriptroot/artifacts/ -type f -name sourcebuild.binlog -exec rename "sourcebuild.binlog" "${name}Build.binlog" * {} \;
++}
++
++subBuild coreclr -subset clr.tools+clr.runtime+clr.corelib+clr.nativecorelib+clr.packages+Clr.Jit+Clr.AllJits $coreclrArgs
++
 +ilasmPath=$(dirname $(find $scriptroot/artifacts/bin -name ilasm))
-+echo "Running command: $scriptroot/build.sh $commonArgs -subset libs $librariesArgs /p:ILAsmToolPath=$ilasmPath $additionalArgs"
-+$scriptroot/build.sh $commonArgs -subset libs $librariesArgs /p:ILAsmToolPath=$ilasmPath $additionalArgs
-+find $scriptroot/artifacts/ -type f -name Build.binlog -exec rename "Build.binlog" "librariesBuild.binlog" * {} \;
-+echo "Running command: $scriptroot/build.sh $commonArgs -subset corehost+installer.managed+installer.depprojs+installer.pkgprojs+bundles $installerArgs /p:ILAsmToolPath=$ilasmPath $additionalArgs"
-+$scriptroot/build.sh $commonArgs -subset corehost+installer.managed+installer.depprojs+installer.pkgprojs+installers+bundles $installerArgs /p:ILAsmToolPath=$ilasmPath $additionalArgs
-+find $scriptroot/artifacts/ -type f -name Build.binlog -exec rename "Build.binlog" "installerBuild.binlog" * {} \;
++subBuild libraries -subset libs $librariesArgs /p:ILAsmToolPath=$ilasmPath
++
++subBuild installer -subset Host.Native+Host.Tools+Packs.Product+Packs.Installers $installerArgs /p:ILAsmToolPath=$ilasmPath
 -- 
 2.25.4
 
