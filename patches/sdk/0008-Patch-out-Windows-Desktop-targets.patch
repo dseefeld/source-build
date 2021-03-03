@@ -11,13 +11,14 @@ diff --git a/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.Sdk.props
 index 4523af8c9..e7d515a49 100644
 --- a/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.Sdk.props
 +++ b/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.Sdk.props
-@@ -144,6 +144,6 @@ Copyright (c) .NET Foundation. All rights reserved.
+@@ -146,7 +146,7 @@ Copyright (c) .NET Foundation. All rights reserved.
    <Import Project="$(MSBuildThisFileDirectory)Microsoft.NET.PackTool.props" />
    <Import Project="$(MSBuildThisFileDirectory)Microsoft.NET.PackProjectTool.props" />
  
 -  <Import Project="$(MSBuildThisFileDirectory)../../Microsoft.NET.Sdk.WindowsDesktop/targets/Microsoft.NET.Sdk.WindowsDesktop.props"/>
 +  <Import Project="$(MSBuildThisFileDirectory)../../Microsoft.NET.Sdk.WindowsDesktop/targets/Microsoft.NET.Sdk.WindowsDesktop.props" Condition="Exists('$(MSBuildThisFileDirectory)../../Microsoft.NET.Sdk.WindowsDesktop/targets/Microsoft.NET.Sdk.WindowsDesktop.props')" />
    <Import Project="$(MSBuildThisFileDirectory)Microsoft.NET.Windows.props" />
+ 
  </Project>
 -- 
 2.25.4
