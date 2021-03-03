@@ -5,14 +5,14 @@ Subject: [PATCH] Emit RepoTasks.binlog
 
 Lets us diagnose errors that occur while building RepoTasks.csproj.
 ---
- build.sh | 1 +
+ eng/build.sh | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/build.sh b/build.sh
+diff --git a/eng/build.sh b/eng/build.sh
 index 3c3cab39ce..029bb4f0c8 100755
---- a/build.sh
-+++ b/build.sh
-@@ -360,6 +360,7 @@ if [ "$build_repo_tasks" = true ]; then
+--- a/eng/build.sh
++++ b/eng/build.sh
+@@ -363,6 +363,7 @@ if [ "$build_repo_tasks" = true ]; then
          -p:Restore=$run_restore \
          -p:Build=true \
          -clp:NoSummary \

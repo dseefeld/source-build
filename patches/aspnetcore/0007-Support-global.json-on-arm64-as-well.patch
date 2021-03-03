@@ -24,18 +24,18 @@ index ee9dcaf4fa..053e92ebee 100644
 +++ b/global.json
 @@ -5,13 +5,10 @@
    "tools": {
-     "dotnet": "6.0.100-preview.1.21073.4",
+     "dotnet": "6.0.100-preview.2.21118.6",
      "runtimes": {
 -      "dotnet/x64": [
 +      "dotnet": [
-         "2.1.23",
+         "2.1.25",
          "$(MicrosoftNETCoreBrowserDebugHostTransportVersion)"
        ],
 -      "dotnet/x86": [
 -        "$(MicrosoftNETCoreBrowserDebugHostTransportVersion)"
 -      ],
        "aspnetcore/x64": [
-         "3.1.11"
+         "3.1.12"
        ]
 -- 
 2.18.0
