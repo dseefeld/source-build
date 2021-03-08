@@ -1,0 +1,25 @@
+From 5d5d1d9cdaf158799e889deea490d912ba7f68f0 Mon Sep 17 00:00:00 2001
+From: Anirudh Agnihotry <anirudhagnihotry098@gmail.com>
+Date: Thu, 11 Feb 2021 14:21:52 -0800
+Subject: [PATCH] platform version (#48175)
+
+---
+ eng/targetframeworksuffix.props | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/eng/targetframeworksuffix.props b/eng/targetframeworksuffix.props
+index e4473df46fa..bb1e24f5046 100644
+--- a/eng/targetframeworksuffix.props
++++ b/eng/targetframeworksuffix.props
+@@ -7,7 +7,7 @@
+ 
+   <PropertyGroup Condition="'$(TargetFrameworkSuffix)' != '' and '$(TargetFrameworkSuffix)' != 'windows'">
+     <TargetPlatformIdentifier>$(TargetFrameworkSuffix)</TargetPlatformIdentifier>
+-    <TargetPlatformVersion>0.0</TargetPlatformVersion>
++    <TargetPlatformVersion>1.0</TargetPlatformVersion>
+     <TargetPlatformMoniker>$(TargetFrameworkSuffix),Version=$(TargetPlatformVersion)</TargetPlatformMoniker>
+   </PropertyGroup>
+   
+-- 
+2.25.4
+
