@@ -46,9 +46,9 @@
       <Uri>https://github.com/dotnet/command-line-api</Uri>
       <Sha>afd010ba8cb3cbd714c734465d1a5de1ee133e2d</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="3.10.0-2.21127.6" CoherentParentDependency="Microsoft.Dotnet.Sdk.Internal">
+    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="3.10.0-2.21153.36" CoherentParentDependency="Microsoft.Dotnet.Sdk.Internal">
       <Uri>https://github.com/dotnet/roslyn</Uri>
-      <Sha>f2eff7c14183c8eebb968988a922abac9618a1fc</Sha>
+      <Sha>8e7913ca2028f1114fae8bb8c837af6e4b9d359e</Sha>
     </Dependency>
     <Dependency Name="Microsoft.Build" Version="16.10.0-preview-21126-01" CoherentParentDependency="Microsoft.Dotnet.Sdk.Internal">
       <Uri>https://github.com/dotnet/msbuild</Uri>
@@ -63,9 +63,9 @@
       <Sha>18863da5be3dc8c7315f4416df1bc9ef96cb7446</Sha>
       <RepoName>nuget-client</RepoName>
     </Dependency>
-    <Dependency Name="Microsoft.NET.Sdk" Version="6.0.100-preview.2.21127.3" CoherentParentDependency="Microsoft.Dotnet.Sdk.Internal">
+    <Dependency Name="Microsoft.NET.Sdk" Version="6.0.100-preview.2.21155.3" CoherentParentDependency="Microsoft.Dotnet.Sdk.Internal">
       <Uri>https://github.com/dotnet/sdk</Uri>
-      <Sha>2d4219797ac8358df8af1505bff8ec8e1f16b59f</Sha>
+      <Sha>64e956e17a21b381853d8ead43f7c02921e4ceaa</Sha>
       <RepoName>sdk</RepoName>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1" CoherentParentDependency="Microsoft.Dotnet.Sdk.Internal">
@@ -83,9 +83,9 @@
       <Uri>https://github.com/dotnet/xliff-tasks</Uri>
       <Sha>a52f3d7fb58470749ee4035fbbcb7e63c78b0459</Sha>
     </Dependency>
-    <Dependency Name="dotnet-dev-certs" Version="6.0.0-preview.2.21125.25" CoherentParentDependency="Microsoft.Dotnet.Sdk.Internal">
+    <Dependency Name="dotnet-dev-certs" Version="6.0.0-preview.2.21154.6" CoherentParentDependency="Microsoft.Dotnet.Sdk.Internal">
       <Uri>https://github.com/dotnet/aspnetcore</Uri>
-      <Sha>e1afec46d3554d5ac6b60067ee0fc85beae3207b</Sha>
+      <Sha>ffaea14b06ea8b247fa4894b7d21ecf6da2cafbc</Sha>
       <RepoName>aspnetcore</RepoName>
     </Dependency>
     <Dependency Name="Microsoft.FSharp.Compiler" Version="11.3.2-beta.21102.9" CoherentParentDependency="Microsoft.Dotnet.Sdk.Internal">
@@ -96,9 +96,9 @@
       <Uri>https://github.com/microsoft/vstest</Uri>
       <Sha>34fa5b59661c3d87c849e81fa5be68e3dec90b76</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Dotnet.Sdk.Internal" Version="6.0.100-preview.2.21127.3">
+    <Dependency Name="Microsoft.Dotnet.Sdk.Internal" Version="6.0.100-preview.2.21155.3">
       <Uri>https://github.com/dotnet/installer</Uri>
-      <Sha>ec984c242620d5668d53f7f62355e420d7dbf206</Sha>
+      <Sha>1a9103db2d2fc2efc82633f0f17bf139cbbb5029</Sha>
       <RepoName>installer</RepoName>
     </Dependency>
     <Dependency Name="Microsoft.Diagnostics.NETCore.Client" Version="0.2.0-preview.20419.2">
