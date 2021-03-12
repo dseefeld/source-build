@@ -73,7 +73,7 @@
     <EnvironmentVariables Include="DotNetFinalVersionKind=release" Condition="'$(IsStable)' == 'true' and '$(IsToolingProject)' != 'true'" />
     <EnvironmentVariables Include="DropSuffix=true" Condition="'$(IsStable)' == 'true' and '$(IsToolingProject)' != 'true'" />
 
-    <EnvironmentVariables Include="DotNetUseShippingVersions=true" />
+    <!-- <EnvironmentVariables Include="DotNetUseShippingVersions=true" /> -->
 
     <EnvironmentVariables Include="PreReleaseVersionLabel=$(PreReleaseVersionLabel)" />
     <EnvironmentVariables Include="PackageVersionStamp=$(PreReleaseVersionLabel)" />
