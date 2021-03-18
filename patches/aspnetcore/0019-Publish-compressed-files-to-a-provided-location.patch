@@ -12,15 +12,15 @@ diff --git a/src/Framework/App.Runtime/src/Microsoft.AspNetCore.App.Runtime.cspr
 index cfbe759aff..285acbd07a 100644
 --- a/src/Framework/App.Runtime/src/Microsoft.AspNetCore.App.Runtime.csproj
 +++ b/src/Framework/App.Runtime/src/Microsoft.AspNetCore.App.Runtime.csproj
-@@ -183,6 +183,7 @@ This package is an internal implementation of the .NET Core SDK and is not meant
+@@ -186,6 +186,7 @@ This package is an internal implementation of the .NET Core SDK and is not meant
+       _BatchCopyToRedistLayout;
        _CreateInternalSharedFxArchive;
        _CreateRedistSharedFxArchive;
-       _InstallFrameworkIntoLocalDotNet;
 +      _PublishCompressedFilesForSourceBuild;
      </CoreBuildDependsOn>
      <CrossGenDependsOn>
        ResolveReferences;
-@@ -560,4 +561,18 @@ This package is an internal implementation of the .NET Core SDK and is not meant
+@@ -566,4 +567,18 @@ This package is an internal implementation of the .NET Core SDK and is not meant
      </ItemGroup>
    </Target>
  
