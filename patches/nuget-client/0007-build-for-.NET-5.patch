@@ -8,9 +8,8 @@ Update netcoreapp TFMs to 5.0.
 Fix package references to comply with PackageVersions.props overrides.
 ---
  build/common.project.props                              | 5 ++---
- build/packages.targets                                  | 6 +++---
  src/NuGet.Core/NuGet.Frameworks/NuGet.Frameworks.csproj | 2 +-
- 3 files changed, 6 insertions(+), 7 deletions(-)
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/build/common.project.props b/build/common.project.props
 index 704369e09..e5827d77e 100644
@@ -35,23 +34,6 @@ index 704369e09..e5827d77e 100644
      <TargetFrameworksLibraryForSigning>$(TargetFrameworksLibrary);netcoreapp5.0</TargetFrameworksLibraryForSigning>
      <RepositoryRootDirectory>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), 'README.md'))\</RepositoryRootDirectory>
      <BuildCommonDirectory>$(RepositoryRootDirectory)build\</BuildCommonDirectory>
-diff --git a/build/packages.targets b/build/packages.targets
-index 03bf7d20b..2d9830a63 100644
---- a/build/packages.targets
-+++ b/build/packages.targets
-@@ -61,9 +61,9 @@
-           To resolve runtime assembly binding failures, we'll downgrade the package from 4.11.1 to 4.9.0.
-         -->
-         <PackageReference Update="System.Diagnostics.Debug" Version="$(SystemPackagesVersion)" />
--        <PackageReference Update="System.Security.Cryptography.Cng" Version="$(CryptographyPackagesVersion)" />
--        <PackageReference Update="System.Security.Cryptography.Pkcs" Version="$(CryptographyPackagesVersion)" />
--        <PackageReference Update="System.Security.Cryptography.ProtectedData" Version="4.4.0" />
-+        <PackageReference Update="System.Security.Cryptography.Cng" Version="$(SystemSecurityCryptographyCngVersion)" />
-+        <PackageReference Update="System.Security.Cryptography.Pkcs" Version="$(SystemSecurityCryptographyPkcsVersion)" />
-+        <PackageReference Update="System.Security.Cryptography.ProtectedData" Version="$(SystemSecurityCryptographyProtectedDataVersion)" />
-         <PackageReference Update="System.Threading.Tasks.Dataflow" Version="4.9.0" />
-         <PackageReference Update="VSLangProj" Version="$(VSFrameworkVersion)" />
-         <PackageReference Update="VSLangProj80" Version="$(VSFrameworkVersion)" />
 diff --git a/src/NuGet.Core/NuGet.Frameworks/NuGet.Frameworks.csproj b/src/NuGet.Core/NuGet.Frameworks/NuGet.Frameworks.csproj
 index a4647839c..2d29adfee 100644
 --- a/src/NuGet.Core/NuGet.Frameworks/NuGet.Frameworks.csproj
