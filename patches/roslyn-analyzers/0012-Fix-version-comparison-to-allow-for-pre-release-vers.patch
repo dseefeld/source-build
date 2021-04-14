@@ -1,0 +1,36 @@
+From 06288f5c6dcb7c30266d23c329815205e554a5f8 Mon Sep 17 00:00:00 2001
+From: Dan Seefeldt <dseefeld@microsoft.com>
+Date: Wed, 14 Apr 2021 10:05:04 -0500
+Subject: [PATCH] Fix version comparison to allow for pre-release versions
+
+---
+ src/Utilities/Compiler/Analyzer.Utilities.projitems | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/Utilities/Compiler/Analyzer.Utilities.projitems b/src/Utilities/Compiler/Analyzer.Utilities.projitems
+index 07c2b68cf..e3fcc34fa 100644
+--- a/src/Utilities/Compiler/Analyzer.Utilities.projitems
++++ b/src/Utilities/Compiler/Analyzer.Utilities.projitems
+@@ -8,10 +8,10 @@
+   <PropertyGroup Label="Configuration">
+     <Import_RootNamespace>Analyzer.Utilities</Import_RootNamespace>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(MicrosoftCodeAnalysisVersion)' == '' OR '$(MicrosoftCodeAnalysisVersion)' &gt;= '3.3'">
++  <PropertyGroup Condition="'$(MicrosoftCodeAnalysisVersion)' == '' OR $([MSBuild]::VersionGreaterThanOrEquals('$(MicrosoftCodeAnalysisVersion)', '3.3'))">
+     <DefineConstants>$(DefineConstants),CODEANALYSIS_V3_OR_BETTER</DefineConstants>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(MicrosoftCodeAnalysisVersion)' == '' OR '$(MicrosoftCodeAnalysisVersion)' &gt;= '3.7'">
++  <PropertyGroup Condition="'$(MicrosoftCodeAnalysisVersion)' == '' OR $([MSBuild]::VersionGreaterThanOrEquals('$(MicrosoftCodeAnalysisVersion)', '3.7'))">
+     <DefineConstants>$(DefineConstants),CODEANALYSIS_V3_7_OR_BETTER</DefineConstants>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(MicrosoftCodeAnalysisVersion)' != '1.2.1'">
+@@ -132,4 +132,4 @@
+   <ItemGroup>
+     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="$(MicrosoftCodeAnalysisVersion)" />
+   </ItemGroup>
+-</Project>
+\ No newline at end of file
++</Project>
+-- 
+2.29.2
+
