@@ -1,0 +1,25 @@
+From 32f094a77317f6989577ec5e133af27ba8a70611 Mon Sep 17 00:00:00 2001
+From: Youssef Victor <youssefvictor00@gmail.com>
+Date: Thu, 8 Apr 2021 08:58:15 +0200
+Subject: [PATCH] Fix compile error
+
+---
+ .../Maintainability/CodeMetricsAnalyzer.cs                      | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/NetAnalyzers/Core/Microsoft.CodeQuality.Analyzers/Maintainability/CodeMetricsAnalyzer.cs b/src/NetAnalyzers/Core/Microsoft.CodeQuality.Analyzers/Maintainability/CodeMetricsAnalyzer.cs
+index 0b6028aca..e4572bfee 100644
+--- a/src/NetAnalyzers/Core/Microsoft.CodeQuality.Analyzers/Maintainability/CodeMetricsAnalyzer.cs
++++ b/src/NetAnalyzers/Core/Microsoft.CodeQuality.Analyzers/Maintainability/CodeMetricsAnalyzer.cs
+@@ -285,7 +285,7 @@ static bool isApplicableByDefault(string ruleId, SymbolKind symbolKind)
+ 
+                         CA1505RuleId => 10,
+ 
+-                        CA1506RuleId => symbolKind == SymbolKind.NamedType ? 95 : 40,
++                        CA1506RuleId => symbolKind == SymbolKind.NamedType ? 95 : (uint)40,
+ 
+                         _ => throw new NotImplementedException(),
+                     };
+-- 
+2.29.2
+
