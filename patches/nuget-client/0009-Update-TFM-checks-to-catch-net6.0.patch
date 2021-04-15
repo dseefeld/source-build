@@ -1,0 +1,37 @@
+From 878d21a21feb6ccbdf25abc70d636208655268c0 Mon Sep 17 00:00:00 2001
+From: dseefeld <dseefeld@microsoft.com>
+Date: Fri, 19 Mar 2021 19:57:32 +0000
+Subject: [PATCH] Update TFM checks to catch net6.0
+
+---
+ build/common.targets | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/build/common.targets b/build/common.targets
+index 63c99f262..4bb82b02e 100644
+--- a/build/common.targets
++++ b/build/common.targets
+@@ -6,17 +6,17 @@
+     <IsDesktop>true</IsDesktop>
+   </PropertyGroup>
+ 
+-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) OR $(TargetFramework.StartsWith('netstandard')) ">
++  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) OR $(TargetFramework.StartsWith('netstandard')) OR $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netcoreapp3.1'))">
+     <DefineConstants>$(DefineConstants);IS_CORECLR</DefineConstants>
+     <IsCore>true</IsCore>
+   </PropertyGroup>
+ 
+-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp5.0' ">
++  <PropertyGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+     <DefineConstants>$(DefineConstants);NETCORE5_0</DefineConstants>
+   </PropertyGroup>
+ 
+   <PropertyGroup>
+-    <SigningNotSupported Condition=" '$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netcoreapp2.1' OR '$(TargetFramework)' == 'netstandard2.1' OR '$(TargetFramework)' == 'netcoreapp3.1'">true</SigningNotSupported>
++    <SigningNotSupported Condition=" '$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netcoreapp2.1' OR '$(TargetFramework)' == 'netstandard2.1' OR $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netcoreapp3.1'))">true</SigningNotSupported>
+     <SigningNotSupported Condition=" '$(SigningNotSupported)' != 'true'">false</SigningNotSupported>
+   </PropertyGroup>
+ 
+-- 
+2.25.4
+

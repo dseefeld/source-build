@@ -62,6 +62,7 @@
     <EnvironmentVariables Include="_InitializeDotNetCli=$(DotNetCliToolDir)" />
     <EnvironmentVariables Include="_DotNetInstallDir=$(DotNetCliToolDir)" />
     <EnvironmentVariables Include="_InitializeToolset=$(ProjectDir)Tools/source-built/Microsoft.DotNet.Arcade.Sdk/tools/Build.proj" Condition="'$(UseBootstrapArcade)' != 'true'" />
+    <EnvironmentVariables Include="_OverrideArcadeInitializeBuildToolFramework=net6.0" Condition="'$(UseBootstrapArcade)' != 'true'" />
 
     <!--
       With ProdCon v2, stabilization options are checked in, unlike ProdCon v1. These should be
@@ -73,7 +74,7 @@
     <EnvironmentVariables Include="DotNetFinalVersionKind=release" Condition="'$(IsStable)' == 'true' and '$(IsToolingProject)' != 'true'" />
     <EnvironmentVariables Include="DropSuffix=true" Condition="'$(IsStable)' == 'true' and '$(IsToolingProject)' != 'true'" />
 
-    <EnvironmentVariables Include="DotNetUseShippingVersions=true" />
+    <!-- <EnvironmentVariables Include="DotNetUseShippingVersions=true" /> -->
 
     <EnvironmentVariables Include="PreReleaseVersionLabel=$(PreReleaseVersionLabel)" />
     <EnvironmentVariables Include="PackageVersionStamp=$(PreReleaseVersionLabel)" />

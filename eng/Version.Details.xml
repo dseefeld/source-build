@@ -27,9 +27,9 @@
       <Sha>422f2f710707c1cf95dd513022c8fbef19f177dc</Sha>
       <RepoName>linker</RepoName>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="6.0.0-preview.1.21102.12">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="6.0.0-preview.2.21154.6">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>9b2776d48183632662e0be873cef029cdb57f8d6</Sha>
+      <Sha>3eaf1f316b8b1da73fdb98e9cca43c0ddaa12f45</Sha>
       <RepoName>runtime</RepoName>
       <RepoName>runtime-portable</RepoName>
     </Dependency>
@@ -37,9 +37,9 @@
       <Uri>https://github.com/dotnet/templating</Uri>
       <Sha>e9be440fd5a04e167c622715b7a920f5cf73aa78</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.Test.ProjectTemplates.5.0" Version="1.0.2-beta4.21072.2">
+    <Dependency Name="Microsoft.DotNet.Test.ProjectTemplates.5.0" Version="1.0.2-beta4.21115.1">
       <Uri>https://github.com/dotnet/test-templates</Uri>
-      <Sha>5b9063959960bf871121c42776d74c0ba3891554</Sha>
+      <Sha>c6344aa90145984186ad80b5f7c6ae5c24d2489f</Sha>
     </Dependency>
     <!-- this should have CPD to Roslyn or runtime but they don't have the proper Version.Details.xml entry - https://github.com/dotnet/runtime/issues/42637 -->
     <Dependency Name="System.CommandLine" Version="2.0.0-beta1.20253.1">
@@ -88,7 +88,7 @@
       <Sha>ffaea14b06ea8b247fa4894b7d21ecf6da2cafbc</Sha>
       <RepoName>aspnetcore</RepoName>
     </Dependency>
-    <Dependency Name="Microsoft.FSharp.Compiler" Version="11.3.2-beta.21102.9" CoherentParentDependency="Microsoft.Dotnet.Sdk.Internal">
+    <Dependency Name="Microsoft.FSharp.Compiler" Version="5.0.2-beta.21102.9" CoherentParentDependency="Microsoft.Dotnet.Sdk.Internal">
       <Uri>https://github.com/dotnet/fsharp</Uri>
       <Sha>7ce7132f1459095e635194d09d6f73265352029a</Sha>
     </Dependency>

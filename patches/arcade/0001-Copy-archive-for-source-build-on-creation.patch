@@ -1,0 +1,37 @@
+From 949d12da3e6f04a2ac02b4ddd643af75790b1376 Mon Sep 17 00:00:00 2001
+From: dseefeld <dseefeld@microsoft.com>
+Date: Wed, 17 Mar 2021 16:59:10 +0000
+Subject: [PATCH] Copy archive for source-build on creation
+
+---
+ .../build/archives.targets                                 | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/Microsoft.DotNet.Build.Tasks.Archives/build/archives.targets b/src/Microsoft.DotNet.Build.Tasks.Archives/build/archives.targets
+index d43451d9..8171097c 100644
+--- a/src/Microsoft.DotNet.Build.Tasks.Archives/build/archives.targets
++++ b/src/Microsoft.DotNet.Build.Tasks.Archives/build/archives.targets
+@@ -50,7 +50,7 @@
+     <ItemGroup>
+       <_TargetRuntimeIdentifiers Include="$(RuntimeIdentifiers)" />
+     </ItemGroup>
+-    
++
+     <PropertyGroup Condition="'$(RuntimeIdentifiers)' != '' and '$(RuntimeIdentifier)' != ''">
+       <!-- Avoid building a project when none of the possible RuntimeIdentifiers is the current RuntimeIdentifier. -->
+       <_RidInRidList Condition="'%(_TargetRuntimeIdentifiers.Identity)' == '$(RuntimeIdentifier)'">true</_RidInRidList>
+@@ -89,6 +89,11 @@
+           IgnoreStandardErrorWarningFormat="true"
+           Condition="!$([MSBuild]::IsOSPlatform(Windows))"/>
+ 
++    <MakeDir Directories="$(PublishCompressedFilesPathPrefix)$(ProductVersion)" Condition="'$(DotNetBuildFromSource)' == 'true'" />
++
++    <Copy SourceFiles="$(_DestinationFileName)"
++          DestinationFolder="$(PublishCompressedFilesPathPrefix)$(ProductVersion)" Condition="'$(DotNetBuildFromSource)' == 'true'" />
++
+     <Message Text="$(_OutputPathRoot) -> $(_DestinationFileName)" Importance="high" />
+   </Target>
+ 
+-- 
+2.25.4
+

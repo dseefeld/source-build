@@ -11,7 +11,7 @@ diff --git a/src/Tools/Source/CompilerGeneratorTools/Source/CSharpSyntaxGenerato
 index 913ecf826dc..4563407b95d 100644
 --- a/src/Tools/Source/CompilerGeneratorTools/Source/CSharpSyntaxGenerator/CSharpSyntaxGenerator.csproj
 +++ b/src/Tools/Source/CompilerGeneratorTools/Source/CSharpSyntaxGenerator/CSharpSyntaxGenerator.csproj
-@@ -10,18 +10,18 @@
+@@ -10,22 +10,22 @@
      <!-- We build this against netcoreapp3.1 to build the console app version, and against netstandard2.0 for
           the Source Generator version. -->
      <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
@@ -21,6 +21,10 @@ index 913ecf826dc..4563407b95d 100644
      <IsShipping>false</IsShipping>
      <ExcludeFromSourceBuild>false</ExcludeFromSourceBuild>
    </PropertyGroup>
+   <ItemGroup>
+     <!-- Make sure to reference the same version of Microsoft.CodeAnalysis.Analyzers as the rest of the build -->
+     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="$(MicrosoftCodeAnalysisAnalyzersVersion)" PrivateAssets="all" />
+   </ItemGroup>
    <ItemGroup>
      <!-- If we're building the command line tool, we have to include some dependencies used for grammar generation -->
 -    <Compile Include="..\..\..\..\..\Compilers\Core\Portable\Symbols\WellKnownMemberNames.cs" Link="Grammar\WellKnownMemberNames.cs" Condition="'$(TargetFramework)' == 'netcoreapp3.1'" />
