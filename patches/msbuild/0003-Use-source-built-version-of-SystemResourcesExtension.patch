@@ -11,8 +11,8 @@ diff --git a/eng/Packages.props b/eng/Packages.props
 index a7844e3b..40b22473 100644
 --- a/eng/Packages.props
 +++ b/eng/Packages.props
-@@ -20,7 +20,7 @@
-     <PackageReference Update="System.Collections.Immutable" Version="5.0.0" />
+@@ -21,7 +21,7 @@
+     <PackageReference Update="System.Configuration.ConfigurationManager" Version="4.7.0" />
      <PackageReference Update="System.Memory" Version="4.5.4" />
      <PackageReference Update="System.Reflection.Metadata" Version="1.6.0" />
 -    <PackageReference Update="System.Resources.Extensions" Version="4.6.0" />

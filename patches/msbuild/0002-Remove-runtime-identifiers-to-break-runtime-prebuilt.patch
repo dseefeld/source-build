@@ -36,9 +36,9 @@ index 2e10ebd..9a89161 100644
 -         This is important for the MSBuild.VSSetup project, which "references" both the x86 and x64
 -         versions of this project -->
 -    <RuntimeIdentifiers>win7-x86;win7-x64</RuntimeIdentifiers>
--    
+-
      <EnableDefaultItems>false</EnableDefaultItems>
-     <DefineConstants>$(DefineConstants);CLR2COMPATIBILITY</DefineConstants>
+     <DefineConstants>$(DefineConstants);CLR2COMPATIBILITY;TASKHOST</DefineConstants>
      <!-- Need pointers for getting environment block -->
 -- 
 1.8.3.1
