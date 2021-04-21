@@ -17,7 +17,11 @@ parameters:
   # properties listed in this comment even if we don't use them here, because it's hard to figure
   # them out from the docs alone--it'll be a nice reference.
   downloadBuildConfig:
-    buildType: current
+    buildType: specific
+    buildVersionToDownload: specific
+    project: 'public'
+    definition: 'source-build-CI'
+    buildId: 1099077
 
 stages:
 - stage: PrepareArtifacts
@@ -47,7 +51,7 @@ stages:
           downloadType: single
           artifactName: ${{ coalesce(gather.artifactName, format('Tarball {0}', gather.job)) }}
           downloadPath: $(nonportableSourceBuiltStageDir)
-          itemPattern: /*/Private.SourceBuilt.Artifacts.*.tar.gz
+          itemPattern: /**/Private.SourceBuilt.Artifacts.*.tar.gz
           allowPartiallySucceededBuilds: true
 
     - task: DownloadBuildArtifacts@0
@@ -57,7 +61,7 @@ stages:
         downloadType: single
         artifactName: 'Tarball ${{ parameters.gatherPortableJob }}'
         downloadPath: $(portableSourceBuiltStageDir)
-        itemPattern: /*/Private.SourceBuilt.Artifacts.*.tar.gz
+        itemPattern: /**/Private.SourceBuilt.Artifacts.*.tar.gz
         allowPartiallySucceededBuilds: true
 
     - script: |
