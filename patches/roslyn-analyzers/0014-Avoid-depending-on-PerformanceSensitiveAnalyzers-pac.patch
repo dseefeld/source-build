@@ -1,0 +1,41 @@
+From 88afb6a89dc3fbc6cd5c9a937ded1b00174f95f1 Mon Sep 17 00:00:00 2001
+From: Dan Seefeldt <dseefeld@microsoft.com>
+Date: Thu, 22 Apr 2021 16:30:27 -0500
+Subject: [PATCH] Avoid depending on PerformanceSensitiveAnalyzers package for
+ PerformanceSensitiveAttribute
+
+See https://github.com/dotnet/roslyn-analyzers/commit/1464e75cf540bf14a1d0b7684a7e24ec1a62ba6e
+---
+ src/Directory.Build.props                           | 3 +++
+ src/Utilities/Compiler/Analyzer.Utilities.projitems | 1 +
+ 2 files changed, 4 insertions(+)
+
+diff --git a/src/Directory.Build.props b/src/Directory.Build.props
+index 5f666332a..d4a1c5207 100644
+--- a/src/Directory.Build.props
++++ b/src/Directory.Build.props
+@@ -19,6 +19,9 @@
+     <!-- Enable all the latest CA rules from 'Microsoft.CodeAnalysis.NetAnalyzers' as build warnings by default. Specific rules are disabled or downgraded in repo's editorconfig. -->
+     <AnalysisLevel>latest</AnalysisLevel>
+     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
++
++    <!-- Do not automatically include PerformanceSensitiveAttribute. It will be included manually. -->
++    <GeneratePerformanceSensitiveAttribute>false</GeneratePerformanceSensitiveAttribute>
+   </PropertyGroup>
+ 
+   <ItemGroup Condition="'$(DotNetBuildFromSource)' != 'true'">
+diff --git a/src/Utilities/Compiler/Analyzer.Utilities.projitems b/src/Utilities/Compiler/Analyzer.Utilities.projitems
+index 7697d80cf..d1dbaa61b 100644
+--- a/src/Utilities/Compiler/Analyzer.Utilities.projitems
++++ b/src/Utilities/Compiler/Analyzer.Utilities.projitems
+@@ -41,6 +41,7 @@
+     <Compile Include="$(MSBuildThisFileDirectory)CodeMetrics\CodeMetricsAnalysisContext.cs" />
+   </ItemGroup>
+   <ItemGroup>
++    <Compile Include="$(MSBuildThisFileDirectory)..\..\..\nuget\PerformanceSensitiveAnalyzers\PerformanceSensitiveAttribute.cs" />
+     <Compile Include="$(MSBuildThisFileDirectory)AdditionalFileProvider.cs" />
+     <Compile Include="$(MSBuildThisFileDirectory)BoundedCacheWithFactory.cs" />
+     <Compile Include="$(MSBuildThisFileDirectory)Debug.cs" />
+-- 
+2.29.2
+
