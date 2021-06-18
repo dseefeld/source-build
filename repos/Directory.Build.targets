@@ -31,6 +31,7 @@
   <PropertyGroup>
     <RepoApiImplemented Condition="'$(RepoApiImplemented)' == ''">true</RepoApiImplemented>
     <EngCommonToolsShFile Condition="Exists('$(ProjectDirectory)/eng/common/tools.sh')">$(ProjectDirectory)/eng/common/tools.sh</EngCommonToolsShFile>
+    <EngCommonBuildShFile Condition="Exists('$(ProjectDirectory)/eng/common/build.sh')">$(ProjectDirectory)/eng/common/build.sh</EngCommonBuildShFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -89,6 +90,21 @@
     <WriteLinesToFile File="$(RepoCompletedSemaphorePath)ApplyPatches.complete" Overwrite="true" />
   </Target>
 
+  <!--
+    Update root repo with trailing slash until https://github.com/dotnet/arcade/pull/7498 gets figured out
+    in arcade an propegated to all repos
+  -->
+  <Target Name="UpdateBuildRepoRoot"
+          BeforeTargets="Build"
+          Condition="'$(EngCommonBuildShFile)' != ''"
+          Inputs="$(MSBuildProjectFullPath)"
+          Outputs="$(RepoCompletedSemaphorePath)UpdateBuildRepoRoot.complete" >
+    <ReplaceTextInFile InputFile="$(EngCommonBuildShFile)"
+      OldText="/p:RepoRoot=&quot;$repo_root&quot;"
+      NewText="/p:RepoRoot=&quot;$repo_root/&quot;" />
+  </Target>
+
+
   <Target Name="UpdateBuildToolFramework"
           BeforeTargets="Build"
           Condition="'$(EngCommonToolsShFile)' != ''"
@@ -96,9 +112,45 @@
           Outputs="$(RepoCompletedSemaphorePath)UpdateBuildToolFramework.complete" >
     <!-- Use a relative find in NewText to avoid regex matches with parent directories.
          See https://github.com/dotnet/source-build/issues/1914 for details. -->
+    <PropertyGroup>
+      <ArcadeSdkReplacementText>
+      logger_path=&quot;%24toolset_dir&quot;/%24%28cd &quot;$toolset_dir&quot; &amp;&amp; find . -name Microsoft.DotNet.Arcade.Sdk.dll \( -regex &apos;.*netcoreapp2.1.*&apos; -or -regex &apos;.*net5.0.*&apos; \) )
+      </ArcadeSdkReplacementText>
+
+      <ArcadeLoggingReplacementText>
+      logger_path=&quot;%24toolset_dir&quot;/%24%28cd &quot;$toolset_dir&quot; &amp;&amp; find . -name Microsoft.DotNet.ArcadeLogging.dll \( -regex &apos;.*netcoreapp2.1.*&apos; -or -regex &apos;.*net5.0.*&apos; \) )
+      </ArcadeLoggingReplacementText>
+
+      <LoggerPathReplacementText>
+      $(ArcadeLoggingReplacementText)
+      if [[ ! -f $logger_path ]]; then
+        $(ArcadeSdkReplacementText)
+      fi
+      </LoggerPathReplacementText>
+    </PropertyGroup>
+    <!-- Arcade has added a new ArcadeLogging library (see: https://github.com/dotnet/arcade/pull/6739)
+      This adds additional scenarios when modifying tools.sh to search for the logger_path.  Source-build
+      builds arcade after the change, so the logger is no longer found in Microsoft.DotNet.Arcade.Sdk,
+      rather, it has moved to Microsoft.DotNet.ArcadeLogging.
+      The scenarios are:
+
+        1. Repo has old tools.sh - replace with new search for logger_path from updated tools.sh which looks for ArcadeLogging first,
+          but make the source-build search changes to find the right dll. -->
+
     <ReplaceTextInFile InputFile="$(EngCommonToolsShFile)"
                        OldText="local logger_path=&quot;$toolset_dir/$_InitializeBuildToolFramework/Microsoft.DotNet.Arcade.Sdk.dll&quot;"
-                       NewText="logger_path=&quot;%24toolset_dir&quot;/%24%28cd &quot;$toolset_dir&quot; &amp;&amp; find . -name Microsoft.DotNet.Arcade.Sdk.dll \( -regex &apos;.*netcoreapp2.1.*&apos; -or -regex &apos;.*net5.0.*&apos; \) )" />
+                       NewText="$(LoggerPathReplacementText)" />
+    <!-- 2. Repo has updated tools.sh, replace 2 logger_path statements with source-build search equivalents to find the right dll -->
+    <ReplaceTextInFile InputFile="$(EngCommonToolsShFile)"
+                       OldText="local logger_path=&quot;$toolset_dir/$_InitializeBuildToolFramework/Microsoft.DotNet.ArcadeLogging.dll&quot;"
+                       NewText="$(ArcadeLoggingReplacementText)" />
+    <ReplaceTextInFile InputFile="$(EngCommonToolsShFile)"
+                       OldText="logger_path=&quot;$toolset_dir/$_InitializeBuildToolFramework/Microsoft.DotNet.Arcade.Sdk.dll&quot;"
+                       NewText="$(ArcadeSdkReplacementText)" />
+    <!-- 3. Repo has 3rd generation of tools.sh.  In this case, we set an override for _InitializeBuildToolFramework -->
+    <ReplaceTextInFile InputFile="$(EngCommonToolsShFile)"
+                       OldText="_InitializeBuildToolFramework=&quot;netcoreapp3.1&quot;"
+                       NewText="_InitializeBuildToolFramework=&quot;%24{_OverrideArcadeInitializeBuildToolFramework-netcoreapp3.1}&quot;" />
 
     <WriteLinesToFile File="$(RepoCompletedSemaphorePath)UpdateBuildToolFramework.complete" Overwrite="true" />
   </Target>
@@ -113,10 +165,10 @@
       <NuGetConfigFiles Include="$(NuGetConfigFile)" />
     </ItemGroup>
 
-    <RemoveInternetSourcesFromNuGetConfig
+    <!-- TODO: RemoveInternetSourcesFromNuGetConfig
       NuGetConfigFile="%(NuGetConfigFiles.Identity)"
       OfflineBuild="$(OfflineBuild)"
-      KeepFeedPrefixes="@(KeepFeedPrefixes)" />
+      KeepFeedPrefixes="@(KeepFeedPrefixes)" /-->
 
     <AddSourceToNuGetConfig NuGetConfigFile="%(NuGetConfigFiles.Identity)"
                             SourceName="prebuilt"
@@ -411,6 +463,39 @@
     </ItemGroup>
   </Target>
 
+  <Target Name="ExtractIntermediatePackages"
+          AfterTargets="Package">
+    <ItemGroup>
+      <_BuiltIntermediatePackages Condition="'$(PackagesOutput)' != ''" Include="$(PackagesOutput)/Microsoft.SourceBuild.Intermediate.*.nupkg" Exclude="$(PackagesOutput)/*.symbols.nupkg"/>
+      <_BuiltIntermediatePackages Condition="'@(PackagesOutputList)' != ''" Include="%(PackagesOutputList.Identity)/Microsoft.SourceBuild.Intermediate.*.nupkg" Exclude="%(PackagesOutputList.Identity)/*.symbols.nupkg"/>
+    </ItemGroup>
+
+    <PropertyGroup Condition="'@(_BuiltIntermediatePackages)' != ''">
+        <_DestinationPath>$(SourceBuiltPackagesPath)</_DestinationPath>
+        <!-- SBRP packages unpack into the Reference packages directory instead of into blob-feed packages -->
+        <_DestinationPath Condition="$([System.String]::Copy(%(_BuiltIntermediatePackages.Identity)).Contains('source-build-reference-packages'))">$(ReferencePackagesDir)</_DestinationPath>
+    </PropertyGroup>
+
+    <ZipFileExtractToDirectory Condition="'@(_BuiltIntermediatePackages)' != ''"
+                            SourceArchive="%(_BuiltIntermediatePackages.Identity)"
+                            DestinationDirectory="$(SourceBuiltPackagesPath)extractArtifacts/"
+                            OverwriteDestination="true" />
+
+    <ItemGroup>
+      <SourceBuiltNupkgFiles Include="$(SourceBuiltPackagesPath)extractArtifacts/**/*.nupkg" />
+    </ItemGroup>
+
+    <Copy
+      Condition="'@(SourceBuiltNupkgFiles)' != ''"
+      SourceFiles="@(SourceBuiltNupkgFiles)"
+      DestinationFiles="@(SourceBuiltNupkgFiles -> '$(_DestinationPath)%(Filename)%(Extension)')" />
+
+    <RemoveDir
+      Condition="Exists('$(SourceBuiltPackagesPath)extractArtifacts/')"
+      Directories="$(SourceBuiltPackagesPath)extractArtifacts/" />
+
+  </Target>
+
   <Target Name="CopyPackage"
           AfterTargets="Package"
           Condition="'$(OutputPlacementRepoApiImplemented)' != 'true' AND ('$(PackagesOutput)' != '' OR '@(PackagesOutputList)' != '')"
@@ -481,6 +566,12 @@
     </ItemGroup>
 
     <Copy SourceFiles="@(ExtractedToolFiles)" DestinationFolder="$(ToolPackageExtractDir)/" />
+
+    <!-- DSEEFELD TODO: Temporary. With the version of arcade being used, this script is not executable. -->
+    <Exec Command="chmod 755 git-clone-to-dir.sh"
+      Condition=" '%(_ToolPackage.Id)' == 'Microsoft.DotNet.Arcade.Sdk' "
+      WorkingDirectory="$(ToolPackageExtractDir)%(_ToolPackage.Id)/tools/SourceBuild/" />
+
 
     <WriteLinesToFile File="$(RepoCompletedSemaphorePath)ExtractToolPackage.complete" Overwrite="true" />
   </Target>

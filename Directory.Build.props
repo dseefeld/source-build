@@ -98,9 +98,6 @@
     <ToolPackageExtractDir>$(ToolsDir)source-built/</ToolPackageExtractDir>
     <ToolsLocalDir>$(ProjectDir)tools-local/</ToolsLocalDir>
     <TaskDirectory>$(ToolsLocalDir)tasks/</TaskDirectory>
-    <DarcInstallDir>$(DotNetCliToolDir)tools/</DarcInstallDir>
-    <DarcVersion>$([System.IO.File]::ReadAllText('$(ProjectDir)DarcVersion.txt').Trim())</DarcVersion>
-    <DarcDll>$(DotNetCliToolDir)tools/.store/microsoft.dotnet.darc/$(DarcVersion)/microsoft.dotnet.darc/$(DarcVersion)/tools/netcoreapp3.0/any/Microsoft.DotNet.Darc.dll</DarcDll>
 
     <XPlatTasksBinDir>$(TaskDirectory)Microsoft.DotNet.SourceBuild.Tasks.XPlat/bin/$(Configuration)/</XPlatTasksBinDir>
     <XPlatSourceBuildTasksAssembly>$(XPlatTasksBinDir)Microsoft.DotNet.SourceBuild.Tasks.XPlat.dll</XPlatSourceBuildTasksAssembly>
@@ -166,11 +163,8 @@
     <ReferencePackagesBaseDir Condition="'$(OfflineBuild)' == 'true'">$(ProjectDir)packages/reference/</ReferencePackagesBaseDir>
     <TextOnlyPackageBaseDir Condition="'$(OfflineBuild)' == 'true'">$(ProjectDir)packages/text-only/</TextOnlyPackageBaseDir>
     <ReferencePackagesDir>$(ReferencePackagesBaseDir)packages/</ReferencePackagesDir>
-    <ReferencePackagesDir Condition="'$(CustomReferencePackagesPath)' != ''">$(CustomReferencePackagesPath)/</ReferencePackagesDir>
     <SourceBuiltArtifactsTarballName>Private.SourceBuilt.Artifacts</SourceBuiltArtifactsTarballName>
     <SourceBuiltArtifactsTarballUrl>https://dotnetcli.azureedge.net/source-built-artifacts/assets/</SourceBuiltArtifactsTarballUrl>
-    <ReferencePackagesTarballName>Private.SourceBuild.ReferencePackages</ReferencePackagesTarballName>
-    <ReferencePackagesTarballUrl>https://dotnetfeed.blob.core.windows.net/dotnet-core/assets/</ReferencePackagesTarballUrl>
     <ArchiveArtifactsTextFileName>archiveArtifacts.txt</ArchiveArtifactsTextFileName>
     <ArchiveArtifactsTextFile>$(ExternalTarballsDir)$(ArchiveArtifactsTextFileName)</ArchiveArtifactsTextFile>
     <BaselineDataFile>$(ToolsLocalDir)prebuilt-baseline-</BaselineDataFile>

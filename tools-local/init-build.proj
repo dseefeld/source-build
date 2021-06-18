@@ -14,7 +14,8 @@
     <BuildTasksTarget Include="Restore;Build;InstallResolver" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(OfflineBuild)' == 'true'">
+  <!-- TODO DSEEFELD: Don't setup these sources now.  Need a switch for building to check prebuilts. -->
+  <PropertyGroup Condition="'$(OfflineBuild)' == 'true' AND 'false' == 'true' ">
     <BuildTasksOfflineSources>$(ReferencePackagesDir)%3B$(PrebuiltPackagesPath)</BuildTasksOfflineSources>
   </PropertyGroup>
 
@@ -22,12 +23,8 @@
     <CallTarget Targets="
       UnpackTarballs;
       BuildXPlatTasks;
-      AcquireDarc;
-      FetchSources;
-      WriteSourceLinkMetadata;
       ExtractToolPackage;
       GenerateRootFs;
-      BuildTextOnlyPackages;
       ApplyPatches;
       PoisonPrebuiltPackages" />
   </Target>
@@ -45,10 +42,11 @@
           Condition="'$(OfflineBuild)' == 'true'"
           Inputs="$(MSBuildProjectFullPath)"
           Outputs="$(CompletedSemaphorePath)UnpackTarballs.complete" >
-    <MakeDir Directories="$(ReferencePackagesDir)"  Condition="'$(CustomReferencePackagesPath)' == ''" />
-    <Exec Command="tar -xzf $(ExternalTarballsDir)$(ReferencePackagesTarballName).*.tar.gz"
-          WorkingDirectory="$(ReferencePackagesDir)"
-          Condition="'$(CustomReferencePackagesPath)' == ''" />
+    <!--TODO DSEEFELD: Make this directory here even though we're no
+        longer unpacking into it because some restore sources are looking
+        for it.  Keeping this because we may want to place build ref packages
+        here just to keep them separate?  -->
+    <MakeDir Directories="$(ReferencePackagesDir)" />
 
     <MakeDir Directories="$(PrebuiltSourceBuiltPackagesPath)" Condition="'$(CustomPrebuiltSourceBuiltPackagesPath)' == ''" />
     <Exec Command="tar -xzf $(ExternalTarballsDir)$(SourceBuiltArtifactsTarballName).*.tar.gz"
@@ -122,6 +120,9 @@
                                DestinationDirectory="$(ArcadeBootstrapPackageDir)microsoft.dotnet.arcade.sdk/$(ARCADE_BOOTSTRAP_VERSION)/"
                                OverwriteDestination="true" />
 
+    <!-- DSEEFELD TODO: Temporary. With the version of arcade being used, this script is not executable. -->
+    <Exec Command="chmod 755 git-clone-to-dir.sh"
+      WorkingDirectory="$(ArcadeBootstrapPackageDir)microsoft.dotnet.arcade.sdk/$(ARCADE_BOOTSTRAP_VERSION)/tools/SourceBuild/" />
     <WriteLinesToFile File="$(CompletedSemaphorePath)ExtractToolPackage.complete" Overwrite="true" />
   </Target>
 
@@ -137,35 +138,6 @@
     <MarkAndCatalogPackages PackagesToMark="@(PrebuiltSourceBuiltPackages)" CatalogOutputFilePath="$(SourceBuiltPoisonReportDataFile)" MarkerFileName="$(SourceBuiltPoisonMarkerFile)" />
 
     <WriteLinesToFile File="$(CompletedSemaphorePath)PoisonPrebuiltPackages.complete" Overwrite="true" />
-  </Target>
-
-  <Target Name="FetchSources"
-          Condition="'$(OfflineBuild)' != 'true'"
-          DependsOnTargets="GetCommonDarcCloneCommand"
-          Inputs="$(MSBuildProjectFullPath)"
-          Outputs="$(CompletedSemaphorePath)FetchSources.complete">
-    <Message Importance="High" Text="[$([System.DateTime]::Now.ToString('HH:mm:ss.ff'))] Getting source code for repos in Version.Details.xml." />
-    <Message Importance="High" Text="[$([System.DateTime]::Now.ToString('HH:mm:ss.ff'))] Running Darc command: '$(DarcCloneCommand)' from working dir $(ProjectDir)" />
-    <Exec Command="$(DarcCloneCommand) --repos-folder $(DarcCloneReposFolder)" WorkingDirectory="$(ProjectDir)" />
-    <Message Importance="High" Text="[$([System.DateTime]::Now.ToString('HH:mm:ss.ff'))] Done getting source code for repos in Version.Details.xml." />
-
-    <WriteLinesToFile File="$(CompletedSemaphorePath)FetchSources.complete" Overwrite="true" />
-  </Target>
-
-  <Target Name="WriteSourceLinkMetadata"
-          Condition="'$(OfflineBuild)' != 'true'"
-          DependsOnTargets="AcquireDarc;FetchSources"
-          Inputs="$(MSBuildProjectFullPath)"
-          Outputs="$(CompletedSemaphorePath)WriteSourceLinkMetadata.complete">
-    <Message Importance="High" Text="[$([System.DateTime]::Now.ToString('HH:mm:ss.ff'))] Writing out SourceLink metadata." />
-    <WriteSourceRepoProperties
-       VersionDetailsFile="$(RepositoryEngineeringDir)Version.Details.xml"
-       ClonedSubmoduleGitRootDirectory="$(ClonedSubmoduleGitRootDirectory)"
-       ClonedSubmoduleDirectory="$(ClonedSubmoduleDirectory)"
-       SourceBuildMetadataDir="$(GitInfoOutputDir)" />
-    <Message Importance="High" Text="[$([System.DateTime]::Now.ToString('HH:mm:ss.ff'))] Done writing out SourceLink metadata." />
-
-    <WriteLinesToFile File="$(CompletedSemaphorePath)WriteSourceLinkMetadata.complete" Overwrite="true" />
   </Target>
 
 </Project>
