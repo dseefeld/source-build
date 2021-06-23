@@ -9,12 +9,16 @@
   <UsingTask AssemblyFile="$(LeakDetectionTasksAssembly)" TaskName="MarkAndCatalogPackages" />
   <UsingTask AssemblyFile="$(XPlatSourceBuildTasksAssembly)" TaskName="NuGetPack" />
   <UsingTask AssemblyFile="$(XPlatSourceBuildTasksAssembly)" TaskName="ZipFileExtractToDirectory" />
+  <UsingTask AssemblyFile="$(XPlatSourceBuildTasksAssembly)" TaskName="ReplaceTextInFile" />
 
   <ItemGroup>
     <BuildTasksTarget Include="Restore;Build;InstallResolver" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(OfflineBuild)' == 'true'">
+  <!-- TODO: Don't setup these sources now.  Need a switch for building to check prebuilts. 
+       Currently, tarball build allows online restore sources.  
+       See https://github.com/dotnet/source-build/issues/2255 -->
+  <PropertyGroup Condition="'$(OfflineBuild)' == 'true' AND 'false' == 'true' ">
     <BuildTasksOfflineSources>$(ReferencePackagesDir)%3B$(PrebuiltPackagesPath)</BuildTasksOfflineSources>
   </PropertyGroup>
 
@@ -22,12 +26,8 @@
     <CallTarget Targets="
       UnpackTarballs;
       BuildXPlatTasks;
-      AcquireDarc;
-      FetchSources;
-      WriteSourceLinkMetadata;
       ExtractToolPackage;
       GenerateRootFs;
-      BuildTextOnlyPackages;
       ApplyPatches;
       PoisonPrebuiltPackages" />
   </Target>
@@ -45,10 +45,12 @@
           Condition="'$(OfflineBuild)' == 'true'"
           Inputs="$(MSBuildProjectFullPath)"
           Outputs="$(CompletedSemaphorePath)UnpackTarballs.complete" >
-    <MakeDir Directories="$(ReferencePackagesDir)"  Condition="'$(CustomReferencePackagesPath)' == ''" />
-    <Exec Command="tar -xzf $(ExternalTarballsDir)$(ReferencePackagesTarballName).*.tar.gz"
-          WorkingDirectory="$(ReferencePackagesDir)"
-          Condition="'$(CustomReferencePackagesPath)' == ''" />
+
+    <!-- Make this directory here even though we're no
+        longer unpacking into it because some restore sources are looking
+        for it.  Keeping this because once source-build-reference-packages
+        is built, the resulting packages will be put here. -->
+    <MakeDir Directories="$(ReferencePackagesDir)" />
 
     <MakeDir Directories="$(PrebuiltSourceBuiltPackagesPath)" Condition="'$(CustomPrebuiltSourceBuiltPackagesPath)' == ''" />
     <Exec Command="tar -xzf $(ExternalTarballsDir)$(SourceBuiltArtifactsTarballName).*.tar.gz"
@@ -122,6 +124,15 @@
                                DestinationDirectory="$(ArcadeBootstrapPackageDir)microsoft.dotnet.arcade.sdk/$(ARCADE_BOOTSTRAP_VERSION)/"
                                OverwriteDestination="true" />
 
+    <!-- TODO: When unpacking using ZipFileExtractToDirectory, this executable file has the wrong
+         permissions.  See https://github.com/dotnet/source-build/issues/2259 -->
+    <Exec Command="chmod 755 git-clone-to-dir.sh"
+      WorkingDirectory="$(ArcadeBootstrapPackageDir)microsoft.dotnet.arcade.sdk/$(ARCADE_BOOTSTRAP_VERSION)/tools/SourceBuild/" />
+
+    <ReplaceTextInFile InputFile="$(ArcadeBootstrapPackageDir)microsoft.dotnet.arcade.sdk/$(ARCADE_BOOTSTRAP_VERSION)/tools/SourceBuild/SourceBuildArcadeTools.targets"
+      OldText="%3CReadSourceBuildIntermediateNupkgDependencies"
+      NewText="%3CReadSourceBuildIntermediateNupkgDependencies Condition=&quot;'%24%28DotNetBuildOffline%29' != 'true'&quot;" />
+
     <WriteLinesToFile File="$(CompletedSemaphorePath)ExtractToolPackage.complete" Overwrite="true" />
   </Target>
 
@@ -137,35 +148,6 @@
     <MarkAndCatalogPackages PackagesToMark="@(PrebuiltSourceBuiltPackages)" CatalogOutputFilePath="$(SourceBuiltPoisonReportDataFile)" MarkerFileName="$(SourceBuiltPoisonMarkerFile)" />
 
     <WriteLinesToFile File="$(CompletedSemaphorePath)PoisonPrebuiltPackages.complete" Overwrite="true" />
-  </Target>
-
-  <Target Name="FetchSources"
-          Condition="'$(OfflineBuild)' != 'true'"
-          DependsOnTargets="GetCommonDarcCloneCommand"
-          Inputs="$(MSBuildProjectFullPath)"
-          Outputs="$(CompletedSemaphorePath)FetchSources.complete">
-    <Message Importance="High" Text="[$([System.DateTime]::Now.ToString('HH:mm:ss.ff'))] Getting source code for repos in Version.Details.xml." />
-    <Message Importance="High" Text="[$([System.DateTime]::Now.ToString('HH:mm:ss.ff'))] Running Darc command: '$(DarcCloneCommand)' from working dir $(ProjectDir)" />
-    <Exec Command="$(DarcCloneCommand) --repos-folder $(DarcCloneReposFolder)" WorkingDirectory="$(ProjectDir)" />
-    <Message Importance="High" Text="[$([System.DateTime]::Now.ToString('HH:mm:ss.ff'))] Done getting source code for repos in Version.Details.xml." />
-
-    <WriteLinesToFile File="$(CompletedSemaphorePath)FetchSources.complete" Overwrite="true" />
-  </Target>
-
-  <Target Name="WriteSourceLinkMetadata"
-          Condition="'$(OfflineBuild)' != 'true'"
-          DependsOnTargets="AcquireDarc;FetchSources"
-          Inputs="$(MSBuildProjectFullPath)"
-          Outputs="$(CompletedSemaphorePath)WriteSourceLinkMetadata.complete">
-    <Message Importance="High" Text="[$([System.DateTime]::Now.ToString('HH:mm:ss.ff'))] Writing out SourceLink metadata." />
-    <WriteSourceRepoProperties
-       VersionDetailsFile="$(RepositoryEngineeringDir)Version.Details.xml"
-       ClonedSubmoduleGitRootDirectory="$(ClonedSubmoduleGitRootDirectory)"
-       ClonedSubmoduleDirectory="$(ClonedSubmoduleDirectory)"
-       SourceBuildMetadataDir="$(GitInfoOutputDir)" />
-    <Message Importance="High" Text="[$([System.DateTime]::Now.ToString('HH:mm:ss.ff'))] Done writing out SourceLink metadata." />
-
-    <WriteLinesToFile File="$(CompletedSemaphorePath)WriteSourceLinkMetadata.complete" Overwrite="true" />
   </Target>
 
 </Project>

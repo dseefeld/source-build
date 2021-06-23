@@ -31,15 +31,6 @@ while :; do
             alternateTarget=true
             MSBUILD_ARGUMENTS+=( "/t:RunSmokeTest" )
             ;;
-        --with-ref-packages)
-            CUSTOM_REF_PACKAGES_DIR="$(cd -P "$2" && pwd)"
-            if [ ! -d "$CUSTOM_REF_PACKAGES_DIR" ]; then
-                echo "Custom reference packages directory '$CUSTOM_REF_PACKAGES_DIR' does not exist"
-                exit 1
-            fi
-            MSBUILD_ARGUMENTS+=( "/p:CustomReferencePackagesPath=$CUSTOM_REF_PACKAGES_DIR" )
-            shift
-            ;;
         --with-packages)
             CUSTOM_PREVIOUSLY_BUILT_PACKAGES_DIR="$(cd -P "$2" && pwd)"
             if [ ! -d "$CUSTOM_PREVIOUSLY_BUILT_PACKAGES_DIR" ]; then
@@ -89,17 +80,12 @@ if [ -f "$SCRIPT_ROOT/packages/archive/archiveArtifacts.txt" ]; then
     echo "ERROR: Private.SourceBuilt.Artifacts artifact not found at $SCRIPT_ROOT/packages/archive/ - Either run prep.sh or pass --with-packages parameter"
     ARCHIVE_ERROR=1
   fi
-  if [ ! -f $SCRIPT_ROOT/packages/archive/Private.SourceBuild.ReferencePackages*.tar.gz ] && [ "$CUSTOM_REF_PACKAGES_DIR" == "" ]; then
-    echo "ERROR: Private.SourceBuild.ReferencePackages artifact not found at $SCRIPT_ROOT/packages/archive/ - Either run prep.sh or pass --with-ref-packages parameter"
-    ARCHIVE_ERROR=1
-  fi
   if [ $ARCHIVE_ERROR == 1 ]; then
     echo ""
-    echo "    Errors detected in tarball. To prep the tarball, run prep.sh while online to install an SDK,"
-    echo "    a Private.SourceBuilt.Artifacts tarball and a Private.SourceBuild.ReferencePackages tarball."
-    echo "    After prepping the tarball, the tarball can be built offline.  As an alternative to prepping"
-    echo "    the tarball, these assets can be provided using the --with-sdk, --with-packages and"
-    echo "    --with-ref-packages parameters."
+    echo "    Errors detected in tarball. To prep the tarball, run prep.sh while online to install an SDK"
+    echo "    and Private.SourceBuilt.Artifacts tarball.  After prepping the tarball, the tarball  can be"
+    echo "    built offline.  As an alternative to prepping the tarball, these assets can be provided using"
+    echo "    the --with-sdk and --with-packages parameters"
     exit 1
   fi
 fi
@@ -160,13 +146,7 @@ if [[ $sourceLinkLine =~ $versionPattern ]]; then
   export SOURCE_LINK_BOOTSTRAP_VERSION=${BASH_REMATCH[1]}
 fi
 
-dotNetHostLine=`grep -m 1 'MicrosoftNETCoreDotNetHostVersion' "$packageVersionsPath"`
-versionPattern="<MicrosoftNETCoreDotNetHostVersion>(.*)</MicrosoftNETCoreDotNetHostVersion>"
-if [[ $dotNetHostLine =~ $versionPattern ]]; then
-  export DOTNET_HOST_BOOTSTRAP_VERSION=${BASH_REMATCH[1]}
-fi
-
-echo "Found bootstrap SDK $SDK_VERSION, bootstrap Arcade $ARCADE_BOOTSTRAP_VERSION, bootstrap SourceLink $SOURCE_LINK_BOOTSTRAP_VERSION, bootstrap DotNetHost $DOTNET_HOST_BOOTSTRAP_VERSION"
+echo "Found bootstrap SDK $SDK_VERSION, bootstrap Arcade $ARCADE_BOOTSTRAP_VERSION, bootstrap SourceLink $SOURCE_LINK_BOOTSTRAP_VERSION"
 
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
